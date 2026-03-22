@@ -6,8 +6,15 @@
     <description>Recent content in Posts on FullFinger&#39;s blog</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 22 Mar 2026 21:55:35 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 22 Mar 2026 23:00:29 +0800</lastBuildDate>
     <atom:link href="https://full-finger.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>光学性质计算</title>
+      <link>https://full-finger.github.io/post/26032201/</link>
+      <pubDate>Sun, 22 Mar 2026 20:30:00 +0800</pubDate>
+      <guid>https://full-finger.github.io/post/26032201/</guid>
+      <description>通过简单的振子模型来估计硅酸盐玻璃的折射率等光学性质</description>
+    </item>
     <item>
       <title>Hello World!</title>
       <link>https://full-finger.github.io/post/helloworld/</link>

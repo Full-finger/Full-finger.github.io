@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://full-finger.github.io/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://full-finger.github.io/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://full-finger.github.io/css/github.min.css' />
+    <link rel="stylesheet" href='https://full-finger.github.io/css/github-style.css' />
+    <link rel="stylesheet" href='https://full-finger.github.io/css/light.css' />
+    <link rel="stylesheet" href='https://full-finger.github.io/css/dark.css' />
+    <link rel="stylesheet" href='https://full-finger.github.io/css/syntax.css' />
+    <title>光学性质计算 - FullFinger&#39;s blog</title>
+    
+    <link rel="icon" type="image/x-icon" href='/images/github-mark.png'>
+    
+    <meta name="theme-color" content="#1e2327">
+
+    
+    
+
+    
+    <meta name="description"
+  content="通过简单的振子模型来估计硅酸盐玻璃的折射率等光学性质" />
+<meta name="keywords"
+  content='blog, google analytics' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://full-finger.github.io/post/26032201/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="光学性质计算 - FullFinger&#39;s blog" />
+<meta name="twitter:description"
+  content="通过简单的振子模型来估计硅酸盐玻璃的折射率等光学性质" />
+<meta name="twitter:site" content="https://full-finger.github.io/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://full-finger.github.io/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="光学性质计算 - FullFinger&#39;s blog">
+<meta property="og:description"
+  content="通过简单的振子模型来估计硅酸盐玻璃的折射率等光学性质" />
+<meta property="og:url" content="https://full-finger.github.io/post/26032201/" />
+<meta property="og:site_name" content="光学性质计算" />
+<meta property="og:image"
+  content="https://full-finger.github.io/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2026-03-22 20:30:00 &#43;0800 CST" />
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://full-finger.github.io/">
+        <img class="octicon" height="32" width="32" src="/images/github-mark-white.png">
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://full-finger.github.io/">
+            </label>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://full-finger.github.io/">
+        <img class="octicon octicon-mark-github v-align-middle" height="32" width="32" src="/images/github-mark-white.png">
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+
+  <div id="search-result" class="container-lg px-3 new-discussion-timeline" style="display: none;">
+</div>
+
+  
+<div class="application-main">
+  <div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://full-finger.github.io/">
+                  <img class=" avatar-user"
+                    src="/images/avatar.jpg"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://full-finger.github.io/">FullFinger</a>
+                  </span>
+                  <span class="path-divider">/</span>
+                  <strong class="css-truncate css-truncate-target mr-1" style="max-width: 410px">
+                    <a href="https://full-finger.github.io/post/26032201/">光学性质计算</a>
+                  </strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Sun, 22 Mar 2026 20:30:00 &#43;0800"
+                    class="no-wrap">
+                    Sun, 22 Mar 2026 20:30:00 &#43;0800</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Sun, 22 Mar 2026 23:00:29 &#43;0800"
+                    class="no-wrap">
+                    Sun, 22 Mar 2026 23:00:29 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header" style="z-index: 2">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    
+                    <summary id="toc-toggle" onclick="clickToc()" class="btn btn-octicon m-0 mr-2 p-2">
+                      <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
+                        <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
+                      </svg>
+                    </summary>
+                    <details-menu class="SelectMenu" id="toc-details" style="display: none;">
+                      <div class="SelectMenu-modal rounded-3 mt-1" style="max-height: 340px;">
+                        <div class="SelectMenu-list SelectMenu-list--borderless p-2" style="overscroll-behavior: contain;" id="toc-list">
+                        </div>
+                      </div>
+                    </details-menu>
+                      2276 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="https://full-finger.github.io/tags/%E6%95%B0%E5%AD%A6">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      数学
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="https://full-finger.github.io/tags/%E7%89%A9%E7%90%86">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      物理
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5" style="z-index: 1">
+                <article class="markdown-body entry-content container-lg"><h2 id="一背景玻璃为什么会吃掉红外光">一、背景：玻璃为什么会&quot;吃掉&quot;红外光？</h2>
+<h3 id="11-现象观察">1.1 现象观察</h3>
+<p>日常生活中的硅酸盐玻璃（窗户、瓶子、光纤）有一个有趣特性：</p>
+<ul>
+<li>可见光：几乎完全透过 → 玻璃透明</li>
+<li>红外光：强烈吸收 → 玻璃红外不透明</li>
+<li>紫外光：强烈吸收 → 玻璃紫外不透明</li>
+</ul>
+<p>这些吸收发生在什么波长？能不能从微观结构推算出来？</p>
+<h3 id="12-模型">1.2 模型</h3>
+<p>由于我们讨论的对象主要是波长相对较长的光，因此选择使用振子模型是非常合适的研究方法。</p>
+<p>一个直观且合理的方式就是光作为电磁波与带电性的分子键和电子云发生作用，类似共振的效果，产生了宏观的吸收与折射效应。</p>
+<h2 id="二微观结构sio四面体">二、微观结构：SiO₄四面体</h2>
+<h3 id="21-硅酸盐玻璃的基本单元">2.1 硅酸盐玻璃的基本单元</h3>
+<p>SiO₂玻璃的骨架由SiO₄四面体构成——一个硅原子在中心，四个氧原子在顶点</p>
+<h3 id="22-三维网络结构">2.2 三维网络结构</h3>
+<p>四面体之间通过Si-O-Si桥氧键首尾相连</p>
+<p>我们的任务便是计算这个骨架振动起来，频率是多少？对应什么波长的光？</p>
+<h2 id="三核心公式简谐振子">三、核心公式：简谐振子</h2>
+<h3 id="31-弹簧振子频率">3.1 弹簧振子频率</h3>
+<p>一根弹簧（弹性常数 $k$），挂一个小球（质量 $m$），振动频率：</p>
+<p>$$\omega = \sqrt{\frac{k}{m}}$$</p>
+<h3 id="32-换算成波数">3.2 换算成波数</h3>
+<p>红外光谱常用波数 $\tilde{\nu}$（单位 cm⁻¹）：</p>
+<p>$$ \boxed{\tilde{\nu} = \frac{1}{2\pi c}\sqrt{\frac{k}{\mu}}} $$</p>
+<blockquote>
+<p><strong>整个计算的核心就这一个公式。</strong></p>
+</blockquote>
+<hr>
+<h2 id="四分步计算伸缩振动">四、分步计算：伸缩振动</h2>
+<h3 id="41-第一步约化质量">4.1 第一步：约化质量</h3>
+<p>Si-O键不是单个小球挂在墙上，而是两个小球互相拉扯。用<strong>约化质量</strong>：</p>
+<p>$$\mu = \frac{m_{Si} \cdot m_O}{m_{Si} + m_O} = \frac{28 \times 16}{28 + 16} = \frac{448}{44} \approx 10.2 \text{ amu}$$</p>
+<p>换算：</p>
+<p>$$\mu = 10.2 \times 1.66 \times 10^{-27} \text{ kg} \approx 1.69 \times 10^{-26} \text{ kg}$$</p>
+<h3 id="42-第二步力常数">4.2 第二步：力常数</h3>
+<p>Si-O键的力常数需要经验值：</p>
+<p>$$k_{\text{stretch}} \approx 450 \text{ N/m}$$</p>
+<blockquote>
+<p><strong>来源验证</strong>：Herzberg《分子光谱》给出SiO₂中Si-O伸缩力常数为400-500 N/m范围</p>
+</blockquote>
+<h3 id="43-第三步代入计算">4.3 第三步：代入计算</h3>
+<p>$$\tilde{\nu} = \frac{1}{2\pi \times 3\times10^{10}}\sqrt{\frac{450}{1.69\times10^{-26}}}$$</p>
+<p>分步：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">步骤</th>
+          <th style="text-align: left">计算</th>
+          <th style="text-align: center">结果</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">①</td>
+          <td style="text-align: left">$k/\mu = 450 / 1.69\times10^{-26}$</td>
+          <td style="text-align: center">$2.66 \times 10^{28}$ s⁻²</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">②</td>
+          <td style="text-align: left">$\sqrt{k/\mu}$</td>
+          <td style="text-align: center">$1.63 \times 10^{14}$ rad/s</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">③</td>
+          <td style="text-align: left">$\div (2\pi c)$</td>
+          <td style="text-align: center"><strong>870 cm⁻¹</strong></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="44-结果对比">4.4 结果对比</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">项目</th>
+          <th style="text-align: center">数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>计算值</strong></td>
+          <td style="text-align: center">870 cm⁻¹</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>实验值</strong></td>
+          <td style="text-align: center">1000-1100 cm⁻¹</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>偏差</strong></td>
+          <td style="text-align: center">~17%</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>偏差来源</strong>：我们只算了一根孤立键，实际四面体中四根键耦合会推高频率。</p>
+<hr>
+<h2 id="五分步计算弯曲振动">五、分步计算：弯曲振动</h2>
+<h3 id="51-弯曲力常数">5.1 弯曲力常数</h3>
+<p>弯曲比拉伸容易，力常数小得多：</p>
+<p>$$k_{\text{bend}} \approx 80 \text{ N/m}$$</p>
+<h3 id="52-代入计算">5.2 代入计算</h3>
+<p>$$\tilde{\nu}_{\text{bend}} = \frac{1}{2\pi c}\sqrt{\frac{80}{1.69\times10^{-26}}} \approx \boxed{370 \text{ cm}^{-1}}$$</p>
+<p><strong>实验值</strong>：450-500 cm⁻¹，偏差约20%。</p>
+<hr>
+<h2 id="六结果汇总">六、结果汇总</h2>
+<pre tabindex="0"><code>┌──────────────────────────────────────────────────────────────┐
+│                     SiO₂ 红外振动模式                        │
+├──────────────────┬──────────┬──────────┬─────────────────────┤
+│     振动模式      │  计算值   │  实验值   │       偏差         │
+├──────────────────┼──────────┼──────────┼─────────────────────┤
+│ Si-O 伸缩        │ 870 cm⁻¹ │ 1050 cm⁻¹│        ~17%        │
+│ Si-O-Si 弯曲     │ 370 cm⁻¹ │ 470 cm⁻¹ │        ~21%        │
+└──────────────────┴──────────┴──────────┴─────────────────────┘
+</code></pre><hr>
+<h2 id="七从频率到波长">七、从频率到波长</h2>
+<h3 id="71-换算关系">7.1 换算关系</h3>
+<p>$$\lambda = \frac{1}{\tilde{\nu}}$$</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">振动</th>
+          <th style="text-align: center">波数</th>
+          <th style="text-align: center">波长</th>
+          <th style="text-align: center">电磁波谱位置</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">伸缩</td>
+          <td style="text-align: center">870 cm⁻¹</td>
+          <td style="text-align: center">11.5 μm</td>
+          <td style="text-align: center"><strong>中红外</strong></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">弯曲</td>
+          <td style="text-align: center">370 cm⁻¹</td>
+          <td style="text-align: center">27 μm</td>
+          <td style="text-align: center"><strong>远红外</strong></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="72-电磁波谱定位">7.2 电磁波谱定位</h3>
+<pre tabindex="0"><code>可见光      近红外       中红外          远红外        微波
+0.4-0.7μm  0.7-2.5μm   2.5-25μm       25-1000μm     &gt;1mm
+                              ↑              ↑
+                          伸缩振动       弯曲振动
+</code></pre><p><strong>结论</strong>：Si-O键的振动频率恰好落在红外区，所以硅酸盐玻璃吸收红外光。</p>
+<hr>
+<h2 id="八延伸紫外那边也有共振">八、延伸：紫外那边也有共振！</h2>
+<h3 id="81-电子云的振动">8.1 电子云的振动</h3>
+<p>除了原子振动，还有<strong>电子云的振动</strong>——频率更高，在紫外区。</p>
+<h3 id="82-从能隙出发">8.2 从能隙出发</h3>
+<p>SiO₂的带隙（电子从价带跳到导带需要的能量）：</p>
+<p>$$E_g \approx 8.9 \text{ eV}$$</p>
+<p>换算：</p>
+<p>$$\lambda = \frac{1240 \text{ eV·nm}}{8.9 \text{ eV}} \approx \boxed{140 \text{ nm}}$$</p>
+<p><strong>深紫外</strong>。这就是SiO₂玻璃的紫外吸收边。</p>
+<h3 id="83-为什么频率差这么多">8.3 为什么频率差这么多？</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">参数</th>
+          <th style="text-align: center">红外振动</th>
+          <th style="text-align: center">紫外电子振动</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">质量</td>
+          <td style="text-align: center">μ ≈ 10 amu</td>
+          <td style="text-align: center">mₑ ≈ 0.00055 amu</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">力常数</td>
+          <td style="text-align: center">k ≈ 450 N/m</td>
+          <td style="text-align: center">k ≈ 170 N/m</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">波长</td>
+          <td style="text-align: center">~10 μm</td>
+          <td style="text-align: center">~140 nm</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">比值</td>
+          <td style="text-align: center">—</td>
+          <td style="text-align: center">约70倍</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>电子比原子轻2000倍</strong>，即使&quot;弹簧&quot;软一些，频率也高出两个数量级。</p>
+<hr>
+<h2 id="九完整图景为什么玻璃是透明的">九、完整图景：为什么玻璃是透明的？</h2>
+<pre tabindex="0"><code>          SiO₂ 玻璃的光学响应全景图
+
+    紫外共振                 可见光窗口                红外共振
+    电子跃迁                                           原子振动
+      │                        │                        │
+      ▼                        ▼                        ▼
+   ┌──────┐              ┌───────────┐              ┌──────┐
+   │强吸收│              │  n ≈ 1.46 │              │强吸收│
+   │      │              │  透明！   │              │      │
+   │140nm │←── 400nm ───│───────────│── 700nm ────→│10μm  │
+   │      │              │           │              │      │
+   └──────┘              └───────────┘              └──────┘
+   E≈8.9eV                                      ν̃≈1000cm⁻¹
+</code></pre><p><strong>核心结论</strong>：可见光的频率刚好落在两个共振峰之间的空白地带，所以玻璃是透明的。</p>
+<hr>
+<h2 id="十折射率也能算">十、折射率也能算！</h2>
+<h3 id="101-lorentz振子模型">10.1 Lorentz振子模型</h3>
+<p>两组共振共同决定折射率：</p>
+<p>$$\varepsilon(\omega) = \varepsilon_\infty + \frac{f_{UV}\omega_{UV}^2}{\omega_{UV}^2 - \omega^2} + \frac{f_{IR}\omega_{IR}^2}{\omega_{IR}^2 - \omega^2}$$</p>
+<h3 id="102-可见光区的简化计算">10.2 可见光区的简化计算</h3>
+<p>在可见光区（$\omega_{IR} \ll \omega \ll \omega_{UV}$），紫外项贡献更大：</p>
+<p>$$n^2 - 1 \approx \frac{\lambda^2}{\lambda^2 - \lambda_{UV}^2}$$</p>
+<p>取 $\lambda_{UV} \approx 128$ nm，$\lambda = 589$ nm（钠黄光）：</p>
+<p>$$n^2 - 1 \approx \frac{589^2}{589^2 - 128^2} = \frac{346921}{330537} \approx 1.049$$</p>
+<p>$$n \approx \sqrt{2.049} \approx 1.43$$</p>
+<p><strong>实验值</strong>：1.458，偏差不到2%。</p>
+<hr>
+<h2 id="十一总结">十一、总结</h2>
+<h3 id="111-推导链条">11.1 推导链条</h3>
+<pre tabindex="0"><code>SiO₄四面体 → Si-O弹簧 → μ, k → ω₀ → ν̃ = ω₀/2πc → 红外/紫外波段 → 共振吸收
+</code></pre><h3 id="112-核心成果">11.2 核心成果</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">步骤</th>
+          <th style="text-align: left">内容</th>
+          <th style="text-align: center">结果</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">①</td>
+          <td style="text-align: left">SiO₄四面体 → Si-O弹簧</td>
+          <td style="text-align: center">约化质量10.2 amu</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">②</td>
+          <td style="text-align: left">取力常数k ≈ 450 N/m</td>
+          <td style="text-align: center">经验值</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">③</td>
+          <td style="text-align: left">$\tilde{\nu} = \frac{1}{2\pi c}\sqrt{k/\mu}$</td>
+          <td style="text-align: center"><strong>870 cm⁻¹</strong></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">④</td>
+          <td style="text-align: left">与实验值对比</td>
+          <td style="text-align: center">偏差~17%</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">⑤</td>
+          <td style="text-align: left">紫外共振（能隙法）</td>
+          <td style="text-align: center"><strong>140 nm</strong></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="113-一句话总结">11.3 一句话总结</h3>
+<blockquote>
+<p><strong>一根弹簧、一个公式、两组参数，就能从SiO₂的微观结构算出它的红外和紫外共振峰。偏差不超过25%，方向完全正确。这就是物理粗算的魅力——不需要复杂的量子化学，抓住核心图像就够了。</strong></p>
+</blockquote>
+<hr>
+<h2 id="参考来源">参考来源</h2>
+<ol>
+<li><strong>Herzberg, G.</strong> <em>Molecular Spectra and Molecular Structure II: Infrared and Raman Spectra of Polyatomic Molecules</em>, Van Nostrand, 1945.</li>
+<li><strong>NIST Chemistry WebBook</strong> - Infrared spectrum of SiO₂, <a href="https://webbook.nist.gov">https://webbook.nist.gov</a></li>
+<li><strong>Handke, M. &amp; Mozgawa, W.</strong> &ldquo;Vibrational spectroscopy of the amorphous silicates,&rdquo; <em>Vibrational Spectroscopy</em>, 1995.</li>
+<li><strong>Kittel, C.</strong> <em>Introduction to Solid State Physics</em>, 8th Edition, Wiley, 2004.</li>
+</ol>
+<hr>
+<p><em>以上计算基于经典振子模型，属于固体物理入门级推导。精确计算需考虑量子效应、非谐性修正及多体耦合。</em></p>
+</article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script type="application/javascript" src='https://full-finger.github.io/js/toc.js'></script>
+<link rel="stylesheet" href='https://full-finger.github.io/css/toc.css' />
+
+  
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://full-finger.github.io/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+      <li class="mr-3 mr-lg-0">GitHub and the Invertocat logo are trademarks of <a href="https://github.com/">GitHub, Inc.</a></li>
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+
+</body>
+
+<script type="application/javascript" src="https://full-finger.github.io/js/github-style.js"></script>
+
+
+
+<script type="text/javascript" async
+  src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\[\[', '\]\]']],
+        processEscapes: true,
+        processEnvironments: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        TeX: {
+          equationNumbers: { autoNumber: "AMS" },
+          extensions: ["AMSmath.js", "AMSsymbols.js"]
+        }
+      }
+    });
+
+    MathJax.Hub.Queue(function () {
+      
+      
+      
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+
+<style>
+  code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+  }
+</style>
+
+
+
+
+
+</html>

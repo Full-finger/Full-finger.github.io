@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>学习 on FullFinger&#39;s blog</title>
+    <link>https://full-finger.github.io/categories/%E5%AD%A6%E4%B9%A0/</link>
+    <description>Recent content in 学习 on FullFinger&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 22 Mar 2026 23:00:29 +0800</lastBuildDate>
+    <atom:link href="https://full-finger.github.io/categories/%E5%AD%A6%E4%B9%A0/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>光学性质计算</title>
+      <link>https://full-finger.github.io/post/26032201/</link>
+      <pubDate>Sun, 22 Mar 2026 20:30:00 +0800</pubDate>
+      <guid>https://full-finger.github.io/post/26032201/</guid>
+      <description>通过简单的振子模型来估计硅酸盐玻璃的折射率等光学性质</description>
+    </item>
+  </channel>
+</rss>
