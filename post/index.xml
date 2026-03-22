@@ -2,10 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on FullFinger&#39;s blog</title>
-    <link>http://localhost:1313/post/</link>
+    <link>https://full-finger.github.io/post/</link>
     <description>Recent content in Posts on FullFinger&#39;s blog</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
-    <atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 22 Mar 2026 21:55:35 +0800</lastBuildDate>
+    <atom:link href="https://full-finger.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello World!</title>
+      <link>https://full-finger.github.io/post/helloworld/</link>
+      <pubDate>Tue, 22 Oct 2019 18:46:47 +0800</pubDate>
+      <guid>https://full-finger.github.io/post/helloworld/</guid>
+      <description>&lt;p&gt;这是一篇测试的文章，您不必理会其内容&lt;/p&gt;</description>
+    </item>
   </channel>
 </rss>

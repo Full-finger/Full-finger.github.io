@@ -6,7 +6,15 @@
     <description>Recent content on FullFinger&#39;s blog</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
+    <lastBuildDate>Sun, 22 Mar 2026 21:55:35 +0800</lastBuildDate>
     <atom:link href="https://full-finger.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello World!</title>
+      <link>https://full-finger.github.io/post/helloworld/</link>
+      <pubDate>Tue, 22 Oct 2019 18:46:47 +0800</pubDate>
+      <guid>https://full-finger.github.io/post/helloworld/</guid>
+      <description>&lt;p&gt;这是一篇测试的文章，您不必理会其内容&lt;/p&gt;</description>
+    </item>
     <item>
       <title></title>
       <link>https://full-finger.github.io/readme/</link>

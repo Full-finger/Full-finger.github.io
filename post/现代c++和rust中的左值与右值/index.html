@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='http://localhost:1313/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='http://localhost:1313/css/frameworks.min.css' />
+    <link rel="stylesheet" href='http://localhost:1313/css/github.min.css' />
+    <link rel="stylesheet" href='http://localhost:1313/css/github-style.css' />
+    <link rel="stylesheet" href='http://localhost:1313/css/light.css' />
+    <link rel="stylesheet" href='http://localhost:1313/css/dark.css' />
+    <link rel="stylesheet" href='http://localhost:1313/css/syntax.css' />
+    <title> - FullFinger&#39;s blog</title>
+    
+    <link rel="icon" type="image/x-icon" href='/images/github-mark.png'>
+    
+    <meta name="theme-color" content="#1e2327">
+
+    
+    
+
+    
+    <meta name="description"
+  content="#cpp #现代cpp #rust #学习 #计算机 #内存
+前言 在编程语言中，左值(lvalue)和右值(rvalue)是简单基础的概念，简单描述了表达式在赋值运算符(=)的位置（ps:这是极其不严谨的说法，但由于这是相当直观且简单的说法，所以这里这么写~~，难道不是不知道该怎么说了吗~~，在文章后段，我们会指出只靠简单的左值和右值两个概念是无法划分的。），在早期，这些概念大多仅限于语法层面的讨论，与实际的工程优化关联不紧密，但是自从c&#43;&#43;11和rust发布后，相关概念变得十分重要。因此这里进行相关学习。
+本文参考如下文章：
+理解 C/C&#43;&#43; 中的左值和右值 | nettee 的 blog 详解 C&#43;&#43; 左值、右值、左值引用以及右值引用 - 斗战胜佛美猴王 - 博客园 彻底搞懂C&#43;&#43;移动语义/左值/右值/引用 - bilibili 值类别：lvalue 和 rvalue (C&#43;&#43;) | Microsoft Learn 现代C&#43;&#43;中的左值和右值及其作用 在早期C/C&#43;&#43;中，没有移动语义，也没有引用 collapsing。那时候的定义比较粗糙：左值被视为指代一个对象的表达式，而右值则被视为了所有并非左值的东西，或者说“表达式的值”。在很多古老的教材或非严格的技术讨论中，人们会混用这两个概念（即值value和右值rvalue）：
+“计算 a &#43; b，我们会得到一个值（value）。”
+有时候他们会把这个“值”直接称为 “rvalue”。
+在这个宽泛的、不严谨的语境下，你可以这样理解那句话：
+“所有表达式最终都会产生一个值（Value），所以所有左值也都是一个值（他们称之为 Rvalue）。”
+但这不是现代 C&#43;&#43; 编程中使用的定义。
+C&#43;&#43;17 标准对表达式值类别的定义如下：
+glvalue 是一个表达式，它的计算可以确定对象、位域或函数的标识。 prvalue 是一个表达式，它的计算可以初始化对象或位域，或计算运算符的操作数值，这是由它出现的上下文所指定的。 xvalue 是一个 glvalue，表示一个对象或位域，该对象或位域的资源可重复使用（通常是因为它接近其生存期的末尾）。 示例：某些涉及 rvalue 引用 (8.3.2) 的类型的表达式会生成 xvalue，例如对返回类型为 rvalue 引用或强制转换为 rvalue 引用类型的函数的调用。 lvalue 为非 xvalue 的 glvalue。 rvalue 是一个 prvalue 或 xvalue。 关系如下所展示
+" />
+<meta name="keywords"
+  content='blog, google analytics' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="http://localhost:1313/post/%E7%8E%B0%E4%BB%A3c&#43;&#43;%E5%92%8Crust%E4%B8%AD%E7%9A%84%E5%B7%A6%E5%80%BC%E4%B8%8E%E5%8F%B3%E5%80%BC/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content=" - FullFinger&#39;s blog" />
+<meta name="twitter:description"
+  content="#cpp #现代cpp #rust #学习 #计算机 #内存
+前言 在编程语言中，左值(lvalue)和右值(rvalue)是简单基础的概念，简单描述了表达式在赋值运算符(=)的位置（ps:这是极其不严谨的说法，但由于这是相当直观且简单的说法，所以这里这么写~~，难道不是不知道该怎么说了吗~~，在文章后段，我们会指出只靠简单的左值和右值两个概念是无法划分的。），在早期，这些概念大多仅限于语法层面的讨论，与实际的工程优化关联不紧密，但是自从c&#43;&#43;11和rust发布后，相关概念变得十分重要。因此这里进行相关学习。
+本文参考如下文章：
+理解 C/C&#43;&#43; 中的左值和右值 | nettee 的 blog 详解 C&#43;&#43; 左值、右值、左值引用以及右值引用 - 斗战胜佛美猴王 - 博客园 彻底搞懂C&#43;&#43;移动语义/左值/右值/引用 - bilibili 值类别：lvalue 和 rvalue (C&#43;&#43;) | Microsoft Learn 现代C&#43;&#43;中的左值和右值及其作用 在早期C/C&#43;&#43;中，没有移动语义，也没有引用 collapsing。那时候的定义比较粗糙：左值被视为指代一个对象的表达式，而右值则被视为了所有并非左值的东西，或者说“表达式的值”。在很多古老的教材或非严格的技术讨论中，人们会混用这两个概念（即值value和右值rvalue）：
+“计算 a &#43; b，我们会得到一个值（value）。”
+有时候他们会把这个“值”直接称为 “rvalue”。
+在这个宽泛的、不严谨的语境下，你可以这样理解那句话：
+“所有表达式最终都会产生一个值（Value），所以所有左值也都是一个值（他们称之为 Rvalue）。”
+但这不是现代 C&#43;&#43; 编程中使用的定义。
+C&#43;&#43;17 标准对表达式值类别的定义如下：
+glvalue 是一个表达式，它的计算可以确定对象、位域或函数的标识。 prvalue 是一个表达式，它的计算可以初始化对象或位域，或计算运算符的操作数值，这是由它出现的上下文所指定的。 xvalue 是一个 glvalue，表示一个对象或位域，该对象或位域的资源可重复使用（通常是因为它接近其生存期的末尾）。 示例：某些涉及 rvalue 引用 (8.3.2) 的类型的表达式会生成 xvalue，例如对返回类型为 rvalue 引用或强制转换为 rvalue 引用类型的函数的调用。 lvalue 为非 xvalue 的 glvalue。 rvalue 是一个 prvalue 或 xvalue。 关系如下所展示
+" />
+<meta name="twitter:site" content="http://localhost:1313/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="http://localhost:1313/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content=" - FullFinger&#39;s blog">
+<meta property="og:description"
+  content="#cpp #现代cpp #rust #学习 #计算机 #内存
+前言 在编程语言中，左值(lvalue)和右值(rvalue)是简单基础的概念，简单描述了表达式在赋值运算符(=)的位置（ps:这是极其不严谨的说法，但由于这是相当直观且简单的说法，所以这里这么写~~，难道不是不知道该怎么说了吗~~，在文章后段，我们会指出只靠简单的左值和右值两个概念是无法划分的。），在早期，这些概念大多仅限于语法层面的讨论，与实际的工程优化关联不紧密，但是自从c&#43;&#43;11和rust发布后，相关概念变得十分重要。因此这里进行相关学习。
+本文参考如下文章：
+理解 C/C&#43;&#43; 中的左值和右值 | nettee 的 blog 详解 C&#43;&#43; 左值、右值、左值引用以及右值引用 - 斗战胜佛美猴王 - 博客园 彻底搞懂C&#43;&#43;移动语义/左值/右值/引用 - bilibili 值类别：lvalue 和 rvalue (C&#43;&#43;) | Microsoft Learn 现代C&#43;&#43;中的左值和右值及其作用 在早期C/C&#43;&#43;中，没有移动语义，也没有引用 collapsing。那时候的定义比较粗糙：左值被视为指代一个对象的表达式，而右值则被视为了所有并非左值的东西，或者说“表达式的值”。在很多古老的教材或非严格的技术讨论中，人们会混用这两个概念（即值value和右值rvalue）：
+“计算 a &#43; b，我们会得到一个值（value）。”
+有时候他们会把这个“值”直接称为 “rvalue”。
+在这个宽泛的、不严谨的语境下，你可以这样理解那句话：
+“所有表达式最终都会产生一个值（Value），所以所有左值也都是一个值（他们称之为 Rvalue）。”
+但这不是现代 C&#43;&#43; 编程中使用的定义。
+C&#43;&#43;17 标准对表达式值类别的定义如下：
+glvalue 是一个表达式，它的计算可以确定对象、位域或函数的标识。 prvalue 是一个表达式，它的计算可以初始化对象或位域，或计算运算符的操作数值，这是由它出现的上下文所指定的。 xvalue 是一个 glvalue，表示一个对象或位域，该对象或位域的资源可重复使用（通常是因为它接近其生存期的末尾）。 示例：某些涉及 rvalue 引用 (8.3.2) 的类型的表达式会生成 xvalue，例如对返回类型为 rvalue 引用或强制转换为 rvalue 引用类型的函数的调用。 lvalue 为非 xvalue 的 glvalue。 rvalue 是一个 prvalue 或 xvalue。 关系如下所展示
+" />
+<meta property="og:url" content="http://localhost:1313/post/%E7%8E%B0%E4%BB%A3c&#43;&#43;%E5%92%8Crust%E4%B8%AD%E7%9A%84%E5%B7%A6%E5%80%BC%E4%B8%8E%E5%8F%B3%E5%80%BC/" />
+<meta property="og:site_name" content="" />
+<meta property="og:image"
+  content="http://localhost:1313/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="http://localhost:1313/">
+        <img class="octicon" height="32" width="32" src="/images/github-mark-white.png">
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:http://localhost:1313/">
+            </label>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="http://localhost:1313/">
+        <img class="octicon octicon-mark-github v-align-middle" height="32" width="32" src="/images/github-mark-white.png">
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+
+  <div id="search-result" class="container-lg px-3 new-discussion-timeline" style="display: none;">
+</div>
+
+  
+<div class="application-main">
+  <div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="http://localhost:1313/">
+                  <img class=" avatar-user"
+                    src="/images/avatar.jpg"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="http://localhost:1313/">FullFinger</a>
+                  </span>
+                  <span class="path-divider">/</span>
+                  <strong class="css-truncate css-truncate-target mr-1" style="max-width: 410px">
+                    <a href="http://localhost:1313/post/%E7%8E%B0%E4%BB%A3c&#43;&#43;%E5%92%8Crust%E4%B8%AD%E7%9A%84%E5%B7%A6%E5%80%BC%E4%B8%8E%E5%8F%B3%E5%80%BC/"></a>
+                  </strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Mon, 01 Jan 0001 00:00:00 &#43;0000"
+                    class="no-wrap">
+                    Mon, 01 Jan 0001 00:00:00 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Wed, 04 Feb 2026 21:30:27 &#43;0800"
+                    class="no-wrap">
+                    Wed, 04 Feb 2026 21:30:27 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header" style="z-index: 2">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    
+                    <summary id="toc-toggle" onclick="clickToc()" class="btn btn-octicon m-0 mr-2 p-2">
+                      <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
+                        <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
+                      </svg>
+                    </summary>
+                    <details-menu class="SelectMenu" id="toc-details" style="display: none;">
+                      <div class="SelectMenu-modal rounded-3 mt-1" style="max-height: 340px;">
+                        <div class="SelectMenu-list SelectMenu-list--borderless p-2" style="overscroll-behavior: contain;" id="toc-list">
+                        </div>
+                      </div>
+                    </details-menu>
+                      2947 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5" style="z-index: 1">
+                <article class="markdown-body entry-content container-lg"><p>#cpp #现代cpp #rust #学习 #计算机 #内存</p>
+<h1 id="前言">前言</h1>
+<p>在编程语言中，左值(lvalue)和右值(rvalue)是简单基础的概念，简单描述了表达式在赋值运算符(=)的位置（ps:这是<strong>极其不严谨</strong>的说法，但由于这是相当直观且简单的说法，所以这里这么写~~，难道不是不知道该怎么说了吗~~，在文章后段，我们会指出只靠简单的左值和右值两个概念是无法划分的。），在早期，这些概念大多仅限于语法层面的讨论，与实际的工程优化关联不紧密，但是自从c++11和rust发布后，相关概念变得十分重要。因此这里进行相关学习。</p>
+<p>本文参考如下文章：</p>
+<ul>
+<li><a href="https://nettee.github.io/posts/2018/Understanding-lvalues-and-rvalues-in-C-and-C/">理解 C/C++ 中的左值和右值 | nettee 的 blog</a></li>
+<li><a href="https://www.cnblogs.com/david-china/p/17080072.html">详解 C++ 左值、右值、左值引用以及右值引用 - 斗战胜佛美猴王 - 博客园</a></li>
+<li><a href="https://www.bilibili.com/video/BV17ce7zLEzu">彻底搞懂C++移动语义/左值/右值/引用 - bilibili</a></li>
+<li><a href="https://learn.microsoft.com/zh-cn/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=msvc-170">值类别：lvalue 和 rvalue (C++) | Microsoft Learn</a></li>
+</ul>
+<h1 id="现代c中的左值和右值及其作用">现代C++中的左值和右值及其作用</h1>
+<p>在早期C/C++中，没有移动语义，也没有引用 collapsing。那时候的定义比较粗糙：左值被视为指代一个对象的表达式，而右值则被视为了所有并非左值的东西，或者说“表达式的值”。在很多古老的教材或非严格的技术讨论中，人们会混用这两个概念（即值value和右值rvalue）：</p>
+<blockquote>
+<p>“计算 <code>a + b</code>，我们会得到一个<strong>值</strong>（value）。”</p>
+</blockquote>
+<p>有时候他们会把这个“值”直接称为 <strong>“rvalue”</strong>。</p>
+<p>在这个宽泛的、不严谨的语境下，你可以这样理解那句话：</p>
+<blockquote>
+<p>“所有表达式最终都会产生一个<strong>值</strong>（Value），所以所有左值也都是一个值（他们称之为 Rvalue）。”</p>
+</blockquote>
+<p><strong>但这不是现代 C++ 编程中使用的定义。</strong></p>
+<blockquote>
+<p>C++17 标准对表达式值类别的定义如下：</p>
+<ul>
+<li>glvalue 是一个表达式，它的计算可以确定对象、位域或函数的标识。</li>
+<li>prvalue 是一个表达式，它的计算可以初始化对象或位域，或计算运算符的操作数值，这是由它出现的上下文所指定的。</li>
+<li>xvalue 是一个 glvalue，表示一个对象或位域，该对象或位域的资源可重复使用（通常是因为它接近其生存期的末尾）。 示例：某些涉及 rvalue 引用 (8.3.2) 的类型的表达式会生成 xvalue，例如对返回类型为 rvalue 引用或强制转换为 rvalue 引用类型的函数的调用。</li>
+<li><em>lvalue</em> 为非 xvalue 的 glvalue。</li>
+<li>rvalue 是一个 prvalue 或 xvalue。</li>
+</ul>
+<p>关系如下所展示</p>
+<p><img src="https://learn.microsoft.com/zh-cn/cpp/cpp/media/value_categories.png?view=msvc-170" alt="表达式分类"></p>
+<p>lvalue 具有程序可访问的地址。 例如，lvalue 表达式包括变量名称，其中包括 <strong><code>const</code></strong> 变量、数组元素、返回 lvalue 引用的函数调用、位域、联合和类成员。</p>
+<p>prvalue 表达式没有可供程序访问的地址。 例如，prvalue 表达式包括文本、可返回非引用类型的函数调用，以及在表达式计算期间创建的但只能由编译器访问的临时对象。</p>
+<p>xvalue 表达式具有程序不再可访问的地址，但可用于初始化右值引用，该引用提供对表达式的访问权限。 例如，它包括可返回 rvalue 引用的函数调用，以及数组下标、成员和指向其中数组或对象是 rvalue 引用的成员表达式的指针。</p>
+</blockquote>
+<p>上面这段引用读起来或许会让人一头雾水，让我们先举些生动的例子来让我们理解。</p>
+<ul>
+<li>
+<p>首先是左值lvalue，它是我们最常接触的且易于理解的，例如<code>int a = 10;</code>中<code>a</code>便是lvalue,它有一个地址，我们可以使用一个指针绑住它<code>int *p = &amp;a;</code>，同时其像一个盒子，我们可以使用<code>a = 2;</code>来修改其中内容。</p>
+</li>
+<li>
+<p>而纯右值prvalue则就是一个幽灵，就像<code>int c = a + b;</code>中的<code>a+b</code>其一旦被计算得到，便会赋值给<code>c</code>，再也不会存在，一般来看，纯右值要么会被编译期优化为立即数或者仅存在在寄存器中，如果是较大的复杂对象，编译器会将其临时存在一个程序员不可见的栈上；</p>
+</li>
+<li>
+<p>xvalue（将亡值）是一种特殊的 glvalue，它标识了一个对象接近其生存期末尾，其资源可以被重用。它通常通过返回右值引用的函数或 <code>std::move</code> 产生，可以将左值修改为右值引用，表示<strong>我不再需要这个对象的当前值</strong>，可以安全地将其资源转移。它是现代 C++ 高效资源管理的核心工具之一，尤其在容器操作、类设计和性能优化中至关重要。可以实现移动而非拷贝。例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">mySwap</span><span class="p">(</span><span class="n">T</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// 移动构造
+</span></span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>     <span class="c1">// 移动赋值
+</span></span></span><span class="line"><span class="cl">    <span class="n">b</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>   <span class="c1">// 移动赋值
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></li>
+<li>
+<p>glvalue即是我们说的可以被取地址的值</p>
+</li>
+<li>
+<p>rvalue则是是一个 prvalue 或 xvalue。</p>
+</li>
+</ul>
+<h3 id="值类别的工程意义移动语义与性能优化">值类别的工程意义：移动语义与性能优化</h3>
+<p>在 C++11 引入移动语义之前，值类别的区分主要用于语法层面的校正。然而，现代 C++ 将这一概念提升到了性能优化的核心地位，主要体现在<strong>避免不必要的深拷贝</strong>。</p>
+<h4 id="1-深拷贝的性能开销">1. 深拷贝的性能开销</h4>
+<p>考虑以下场景：一个函数返回一个包含大量数据的对象，如 <code>std::vector</code>。</p>
+<pre tabindex="0"><code>std::vector&lt;int&gt; createVector() {
+    std::vector&lt;int&gt; temp(1000000); // 构造包含 100 万元素的向量
+    return temp;
+}
+
+int main() {
+    std::vector&lt;int&gt; v = createVector(); 
+}
+</code></pre><p>在旧的 C++ 标准（C++11 之前）中，如果没有编译器的优化（如 RVO），上述代码会发生深拷贝：</p>
+<ol>
+<li>函数内的局部对象 <code>temp</code> 被拷贝给 main 函数中的临时对象。</li>
+<li>临时对象再被拷贝给 <code>v</code>。</li>
+<li>每次拷贝都需要分配内存并复制一百万个整数，产生巨大的 CPU 和内存开销。</li>
+</ol>
+<h4 id="2-移动语义的引入">2. 移动语义的引入</h4>
+<p>现代 C++ 利用<strong>值类别</strong>来区分“拷贝”与“移动”：</p>
+<ul>
+<li><strong>左值：</strong> 代表持久存在的对象。对其进行赋值通常意味着“拷贝”，因为源对象后续可能仍需使用，必须保持原状。</li>
+<li><strong>右值：</strong> 代表临时的或即将销毁的对象。对其进行赋值意味着“移动”，因为源对象即将消亡，窃取其内部资源（如堆内存指针）不仅安全，而且高效。</li>
+</ul>
+<p><code>std::move</code> 并不移动任何东西，它本质上是一个<strong>静态类型转换</strong>，将一个左值强制转换为<strong>xvalue</strong>（将亡值）。这告诉编译器：“该对象不再被需要，可以安全地调用移动构造函数或移动赋值运算符”。</p>
+<p><strong>优化后的 <code>std::swap</code> 实现：</strong></p>
+<pre tabindex="0"><code>template &lt;typename T&gt;
+void mySwap(T&amp; a, T&amp; b) {
+    T tmp = std::move(a); // a 转换为 xvalue，tmp 接管 a 的资源
+    a = std::move(b);     // b 转换为 xvalue，a 接管 b 的资源
+    b = std::move(tmp);   // tmp 转换为 xvalue，b 接管 tmp 的资源
+}
+</code></pre><p>在该实现中，对于像 <code>std::string</code> 或 <code>std::vector</code> 这样的对象，整个过程仅涉及指针的交换，无需任何内存数据的复制，时间复杂度从 O(N) 降低至 O(1)。</p>
+<h3 id="rust-中的值类别与所有权机制">Rust 中的值类别与所有权机制</h3>
+<p>Rust 借鉴了 C++ 的值类别概念，并将其整合到其核心的所有权和借用系统中。虽然 Rust 的术语与 C++ 略有不同，但其底层逻辑依然基于表达式的生命周期和内存位置。</p>
+<h4 id="1-移动作为默认行为">1. 移动作为默认行为</h4>
+<p>在 C++ 中，左值的默认行为是拷贝，移动通常需要显式地使用 <code>std::move</code> 触发。而在 Rust 中，对于未实现 <code>Copy</code> trait 的类型（如 <code>String</code>, <code>Vec</code>），赋值操作默认即为移动。</p>
+<pre tabindex="0"><code>let s1 = String::from(&#34;hello&#34;);
+let s2 = s1; 
+// println!(&#34;{}&#34;, s1); // 编译错误：use of moved value: `s1`
+</code></pre><p>尽管 <code>s1</code> 在语法上是一个左值（具有内存地址），但在赋值给 <code>s2</code> 的语义中，编译器将其视为资源可被转移的实体。一旦所有权转移，原变量 <code>s1</code> 即被失效，这从编译器层面杜绝了“悬垂指针”的风险。</p>
+<h4 id="2-生命周期与借用">2. 生命周期与借用</h4>
+<p>Rust 的借用检查器严格依赖左值和右值的生命周期属性：</p>
+<ul>
+<li><strong>左值：</strong> 拥有明确的生命周期作用域，可以通过引用进行共享或可变借用。</li>
+<li><strong>右值：</strong> 通常是表达式计算产生的临时值。Rust 规定，临时值的生命周期通常不能超出包含它的语句，除非通过 <code>let</code> 绑定将其延长。</li>
+</ul>
+<p>这种严格的机制对应了 C++ 中“不可对右值取地址”的底层约束，但 Rust 将其上升为语法规则，从而在无需垃圾回收器的情况下保证内存安全。</p>
+<h3 id="总结">总结</h3>
+<p>现代系统级编程语言对左值和右值的区分，早已超越了简单的“赋值位置”描述。实际上，这是对<strong>对象生命周期</strong>和<strong>资源管理权限</strong>的精确划分：</p>
+<ol>
+<li>
+<p><strong>身份与持久性：</strong></p>
+<ul>
+<li><strong>左值</strong> 标识了持久存在的对象，可以安全地取地址并长期持有引用。</li>
+<li><strong>右值</strong> 标识了临时或即将销毁的对象，其资源可以被重用。</li>
+</ul>
+</li>
+<li>
+<p><strong>性能与安全：</strong></p>
+<ul>
+<li><strong>C++</strong> 利用右值属性实现<strong>移动语义</strong>，消除了不必要的深拷贝，极大提升了程序性能。</li>
+<li><strong>Rust</strong> 利用所有权移动规则，在编译期强制执行内存安全，防止了数据竞争和内存泄漏。</li>
+</ul>
+</li>
+</ol>
+<p>理解这些概念，是深入掌握现代 C++ 高性能编程和 Rust 内存安全模型的关键基础。</p>
+</article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script type="application/javascript" src='http://localhost:1313/js/toc.js'></script>
+<link rel="stylesheet" href='http://localhost:1313/css/toc.css' />
+
+  
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="http://localhost:1313/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+      <li class="mr-3 mr-lg-0">GitHub and the Invertocat logo are trademarks of <a href="https://github.com/">GitHub, Inc.</a></li>
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+
+</body>
+
+<script type="application/javascript" src="http://localhost:1313/js/github-style.js"></script>
+
+
+
+
+
+
+
+</html>
