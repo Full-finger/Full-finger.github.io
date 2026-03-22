@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>FullFinger&#39;s blog</title>
+    <link>https://fullfinger.github.io/</link>
+    <description>Recent content on FullFinger&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <atom:link href="https://fullfinger.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title></title>
+      <link>https://fullfinger.github.io/readme/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://fullfinger.github.io/readme/</guid>
+      <description>&lt;h1 id=&#34;欢迎&#34;&gt;欢迎&lt;/h1&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://img.shields.io/badge/%E4%BD%A0%E5%A5%BD!-orangeorange.svg?style=social&#34; alt=&#34;欢迎语1&#34;&gt;&lt;br&gt;&#xA;&lt;img src=&#34;https://img.shields.io/badge/Hello!-orangeorange.svg?style=social&#34; alt=&#34;欢迎语2&#34;&gt;&lt;br&gt;&#xA;&lt;img src=&#34;https://img.shields.io/badge/Ciallo%EF%BD%9E%28%E2%88%A0%E3%83%BB%CF%89%3C%29%E2%8C%92%E2%98%85-orange?style=social&#34; alt=&#34;欢迎语3&#34;&gt;&lt;br&gt;&#xA;&lt;img src=&#34;https://img.shields.io/badge/%E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF!-orangeorange.svg?style=social&#34; alt=&#34;欢迎语4&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;19岁，是学生&lt;/p&gt;&#xA;&lt;p&gt;喜欢你来，很高兴见到你！&lt;strong&gt;希望你&lt;/strong&gt;能在这里找到还算有趣的内容。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
