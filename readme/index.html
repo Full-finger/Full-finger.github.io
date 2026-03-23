@@ -290,11 +290,11 @@
   }
 
    
-  .gh-tooltip {
+.gh-tooltip {
     position: fixed; pointer-events: none;
     z-index: 1000; display: none;
   }
-  .gh-tooltip.show { display: block; animation: ghFadeIn 150ms ease-out; }
+  .gh-tooltip.show { display: block; }
   .gh-tooltip__body {
     background: rgba(30,30,30,0.95); backdrop-filter: blur(12px);
     border-radius: 8px; padding: 8px 12px;
@@ -305,29 +305,47 @@
   [data-color-mode="dark"] .gh-tooltip__body {
     background: rgba(17,24,39,0.95);
   }
-  .gh-tooltip__arrow { position: absolute; width: 0; height: 0; border-style: solid; }
+
+  .gh-tooltip__arrow {
+    position: absolute; left: 50%;
+    width: 0; height: 0; border-style: solid;
+    transform: translateX(-50%);
+  }
+
+   
   .gh-tooltip.above .gh-tooltip__arrow {
-    bottom: 100%; left: 50%; transform: translateX(-50%);
-    border-width: 0 6px 6px 6px;
-    border-color: transparent transparent rgba(30,30,30,0.95) transparent;
-    margin-bottom: -1px;
-  }
-  [data-color-mode="dark"] .gh-tooltip.above .gh-tooltip__arrow {
-    border-color: transparent transparent rgba(17,24,39,0.95) transparent;
-  }
-  .gh-tooltip.below .gh-tooltip__arrow {
-    top: 100%; left: 50%; transform: translateX(-50%);
+    top: 100%;
     border-width: 6px 6px 0 6px;
     border-color: rgba(30,30,30,0.95) transparent transparent transparent;
     margin-top: -1px;
   }
-  [data-color-mode="dark"] .gh-tooltip.below .gh-tooltip__arrow {
+  [data-color-mode="dark"] .gh-tooltip.above .gh-tooltip__arrow {
     border-color: rgba(17,24,39,0.95) transparent transparent transparent;
   }
+
+   
+  .gh-tooltip.below .gh-tooltip__arrow {
+    bottom: 100%;
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent rgba(30,30,30,0.95) transparent;
+    margin-bottom: -1px;
+  }
+  [data-color-mode="dark"] .gh-tooltip.below .gh-tooltip__arrow {
+    border-color: transparent transparent rgba(17,24,39,0.95) transparent;
+  }
+
+  .gh-tooltip.above.show { animation: ghFadeIn 150ms ease-out; }
+  .gh-tooltip.below.show { animation: ghFadeInBelow 150ms ease-out; }
+
   @keyframes ghFadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes ghFadeInBelow {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
 
   .heatmap-cell {
     transition: opacity 150ms, filter 150ms;
@@ -502,9 +520,9 @@
   svg.addEventListener('mouseover', (e) => {
     if (e.target.classList.contains('heatmap-cell')) showTooltip(e);
   });
-  svg.addEventListener('mousemove', (e) => {
-    if (e.target.classList.contains('heatmap-cell')) showTooltip(e);
-  });
+  
+  
+  
   svg.addEventListener('mouseout', (e) => {
     if (e.target.classList.contains('heatmap-cell')) hideTooltip();
   });
