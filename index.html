@@ -478,8 +478,20 @@
         过去一年 <strong id="gh-stats-count">--</strong> 次贡献
       </span>
     </div>
-    <div class="gh-heatmap-body">
-      <svg id="gh-svg" class="gh-heatmap-svg" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="gh-heatmap-body" id="gh-heatmap-body">
+      
+      <div id="gh-skeleton" class="gh-skeleton">
+        <div class="gh-skeleton-header">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="gh-skeleton-grid">
+          <div class="gh-skeleton-side">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="gh-skeleton-cells" id="gh-skel-cells"></div>
+        </div>
+      </div>
+      <svg id="gh-svg" class="gh-heatmap-svg" preserveAspectRatio="xMidYMid meet" style="opacity:0"></svg>
     </div>
     <div class="gh-heatmap-footer">
       <div class="gh-heatmap-legend">
@@ -535,14 +547,95 @@
   }
 
   .gh-heatmap-body {
-    overflow-x: auto; overflow-y: hidden;
-    margin: 0 -12px; padding: 0 12px;
+  overflow-x: auto; overflow-y: hidden;
+  margin: 0 -12px; padding: 0 12px;
+  position: relative;
+  height: 110px; 
+}
+.gh-heatmap-svg {
+  width: 100%; height: auto;
+  display: block;
+  transition: opacity 0.4s ease;
+  position: relative;
+}
+
+.gh-skeleton {
+  position: absolute;
+  top: 0; left: 40px; right: 40px;
+  transition: opacity 0.3s ease;
+}
+
+  .gh-skeleton-header {
+    display: flex; gap: 14px;
+    margin-bottom: 4px; padding: 4px 0 2px 0;
   }
-  .gh-heatmap-svg {
-    width: 100%; height: auto;
-    display: block;
+  .gh-skeleton-header span {
+    width: 28px; height: 10px; border-radius: 3px;
+    background: currentColor; opacity: 0.08;
+    animation: ghPulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .gh-skeleton-header span:nth-child(2) { animation-delay: 0.1s; }
+  .gh-skeleton-header span:nth-child(3) { animation-delay: 0.2s; }
+  .gh-skeleton-header span:nth-child(4) { animation-delay: 0.3s; }
+  .gh-skeleton-header span:nth-child(5) { animation-delay: 0.4s; }
+  .gh-skeleton-header span:nth-child(6) { animation-delay: 0.5s; }
+
+  .gh-skeleton-grid {
+    display: flex; gap: 3px;
+  }
+  .gh-skeleton-side {
+    display: flex; flex-direction: column; gap: 3px;
+    flex-shrink: 0; margin-left: -28px;
+  }
+  .gh-skeleton-side span {
+    width: 24px; height: 11px; border-radius: 2px;
+    background: currentColor; opacity: 0.06;
+    animation: ghPulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .gh-skeleton-side span:nth-child(odd) { opacity: 0; }
+
+  .gh-skeleton-cells {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(53, 11px);
+    grid-template-rows: repeat(7, 11px);
+    gap: 3px;
+  }
+  .gh-skel-cell {
+    width: 11px; height: 11px; border-radius: 2px;
+    background: currentColor; opacity: 0.06;
+    animation: ghPulse 1.5s ease-in-out infinite;
   }
 
+   
+  @media (max-width: 640px) {
+    .gh-skeleton-cells {
+      grid-template-rows: repeat(14, 11px);
+    }
+    .gh-skeleton-side {
+       
+    }
+    .gh-skeleton-side span {
+      display: block;
+    }
+    .gh-skeleton-side span:nth-child(odd) {
+      display: none;
+    }
+  }
+
+  @keyframes ghPulse {
+    0%, 100% { opacity: 0.06; }
+    50%      { opacity: 0.14; }
+  }
+
+  .gh-skeleton.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+   
   .gh-heatmap-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
   .gh-heatmap-legend {
     display: flex; align-items: center;
@@ -627,7 +720,7 @@
   const LEVEL_OPACITY = [0.05, 0.25, 0.5, 0.75, 1.0];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const DAYS_7  = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
-  const DAYS_14 = ['', 'Mon', '', 'Wed', '', 'Fri', '', 'Sun', '', 'Tue', '', 'Thu', '', 'Sat'];
+  const DAYS_14 = ['', 'Mon', '', 'Tue', '', 'Wed', '', 'Thu', '', 'Fri', '', 'Sat', '', 'Sun'];
   const LABEL_OFFSET = 28, HEADER_OFFSET = 16;
   const MOBILE_BREAKPOINT = 640;
 
@@ -636,8 +729,47 @@
   const tooltip = document.getElementById('gh-tooltip');
   const tooltipBody = tooltip.querySelector('.gh-tooltip__body');
   const tooltipArrow = tooltip.querySelector('.gh-tooltip__arrow');
+  const skeleton = document.getElementById('gh-skeleton');
+  const skelCells = document.getElementById('gh-skel-cells');
+
+  let contributions = [];
+  let dataLoaded = false;
 
   
+  function buildSkeletonCells() {
+    skelCells.innerHTML = '';
+    const rows = getRows();
+    
+    const cols = rows === 14 ? 27 : 53;
+    skelCells.style.gridTemplateRows = `repeat(${rows}, 11px)`;
+    skelCells.style.gridTemplateColumns = `repeat(${cols}, 11px)`;
+    for (let i = 0; i < cols * rows; i++) {
+      const d = document.createElement('div');
+      d.className = 'gh-skel-cell';
+      d.style.animationDelay = (Math.random() * 1.5).toFixed(2) + 's';
+      skelCells.appendChild(d);
+    }
+  }
+
+  
+  function buildSkeletonSide() {
+    const side = skeleton.querySelector('.gh-skeleton-side');
+    side.innerHTML = '';
+    const rows = getRows();
+    for (let i = 0; i < rows; i++) {
+      const span = document.createElement('span');
+      
+      if (i % 2 === 0) {
+        span.style.opacity = '0';
+        span.style.height = '11px';
+      }
+      side.appendChild(span);
+    }
+  }
+
+  buildSkeletonSide();
+  buildSkeletonCells();
+
   function isDark() {
     return document.documentElement.getAttribute('data-color-mode') === 'dark';
   }
@@ -648,7 +780,6 @@
     return `rgba(35,154,59,${LEVEL_OPACITY[Math.min(level, 4)]})`;
   }
 
-  
   function getRows() {
     return window.innerWidth <= MOBILE_BREAKPOINT ? 14 : 7;
   }
@@ -659,22 +790,33 @@
     return Math.ceil(contributions.length / getRows());
   }
   function svgSize() {
-    const rows = getRows();
     return {
       w: LABEL_OFFSET + weeks() * (CELL + GAP),
-      h: HEADER_OFFSET + rows * (CELL + GAP),
+      h: HEADER_OFFSET + getRows() * (CELL + GAP),
     };
   }
 
-  
-  let contributions = [];
-
-  async function fetchData() {
-    const res = await fetch(`https://github-contributions-api.jogruber.de/v4/full-finger?y=last`);
-    return res.json();
+  async function fetchData(retries = 3) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(
+        `https://github-contributions-api.jogruber.de/v4/full-finger?y=last`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      if (!res.ok) throw new Error(res.status);
+      return res.json();
+    } catch (e) {
+      clearTimeout(timeout);
+      if (retries > 0) {
+        await new Promise(r => setTimeout(r, 2000));
+        return fetchData(retries - 1);
+      }
+      throw e;
+    }
   }
 
-  
   function buildMonthLabels() {
     const rows = getRows();
     const labels = [];
@@ -688,28 +830,29 @@
         last = m;
       }
     }
-    
-    if (labels.length >= 2 && labels[1].x - labels[0].x < CELL + GAP + 20) {
+    if (labels.length >= 2 && labels[1].x - labels[0].x < 40) {
       labels.shift();
     }
     return labels;
-}
-
-  
+  }
 
   function render() {
+    if (!dataLoaded || contributions.length === 0) return;
+
     const rows = getRows();
     const days = getDays();
     const { w, h } = svgSize();
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     svg.innerHTML = '';
 
+    const bodyEl = document.getElementById('gh-heatmap-body');
+    bodyEl.style.height = h + 'px';
+
     const fill = labelColor();
 
-    
     buildMonthLabels().forEach(({ text, x }) => {
       const el = document.createElementNS(NS, 'text');
-      el.setAttribute('x',  x);
+      el.setAttribute('x', x);
       el.setAttribute('y', 11);
       el.setAttribute('font-size', 10);
       el.setAttribute('fill', fill);
@@ -717,7 +860,6 @@
       svg.appendChild(el);
     });
 
-    
     days.forEach((d, i) => {
       if (!d) return;
       const el = document.createElementNS(NS, 'text');
@@ -729,7 +871,6 @@
       svg.appendChild(el);
     });
 
-    
     contributions.forEach((day, idx) => {
       const col = Math.floor(idx / rows);
       const row = idx % rows;
@@ -749,6 +890,14 @@
   }
 
   
+  function transitionIn() {
+    skeleton.classList.add('hidden');
+    setTimeout(() => {
+      skeleton.style.display = 'none';
+      svg.style.opacity = '1';
+    }, 300);
+  }
+
   function formatDate(str) {
     const d = new Date(str);
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
@@ -757,34 +906,26 @@
   function showTooltip(e) {
     const rect = e.target;
     if (!rect.dataset.date) return;
-
     const count = parseInt(rect.dataset.count, 10);
     tooltipBody.textContent = count > 0
       ? `${formatDate(rect.dataset.date)}: ${count} 次贡献`
       : `${formatDate(rect.dataset.date)}: 无贡献`;
-
     tooltip.classList.add('show');
-
     const cellRect = rect.getBoundingClientRect();
     const tipRect = tooltip.getBoundingClientRect();
     const gap = 8, margin = 8;
-
     let x = cellRect.left + cellRect.width / 2 - tipRect.width / 2;
     let y = cellRect.top - tipRect.height - gap;
     let above = true;
-
     x = Math.max(margin, Math.min(x, window.innerWidth - tipRect.width - margin));
-
     if (y < margin) {
       y = cellRect.bottom + gap;
       above = false;
     }
-
     tooltip.style.left = x + 'px';
     tooltip.style.top = y + 'px';
     tooltip.classList.toggle('above', above);
     tooltip.classList.toggle('below', !above);
-
     const arrowX = cellRect.left + cellRect.width / 2 - x;
     tooltipArrow.style.left = arrowX + 'px';
   }
@@ -793,42 +934,48 @@
     tooltip.classList.remove('show');
   }
 
-  
   svg.addEventListener('mouseover', (e) => {
     if (e.target.classList.contains('heatmap-cell')) showTooltip(e);
   });
   svg.addEventListener('mouseout', (e) => {
-    if (e.target.classList.contains('heatmap-cell')) hideTooltip();
+    if (e.target.classList.contains('heatmap-cell')) hideTooltip(e);
   });
 
-  
   new MutationObserver(render).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['data-color-mode'],
   });
 
-  
   let lastRows = getRows();
   window.addEventListener('resize', () => {
     const current = getRows();
     if (current !== lastRows) {
       lastRows = current;
+      
+      if (!dataLoaded) {
+        buildSkeletonCells();
+        buildSkeletonSide();
+      }
       render();
     }
   });
 
-  
   fetchData()
     .then((data) => {
       statsCount.textContent = data.total.lastYear;
       contributions = data.contributions;
+      dataLoaded = true;
       render();
+      transitionIn();
     })
-    .catch(() => { statsCount.textContent = '--'; });
+    .catch(() => {
+      statsCount.textContent = '加载失败';
+      skeleton.classList.add('hidden');
+      setTimeout(() => { skeleton.style.display = 'none'; }, 300);
+    });
 
 })();
 </script>
-
 
 <p>19岁，是学生</p>
 <p>喜欢你来，很高兴见到你！<strong>希望你</strong>能在这里找到还算有趣的内容。</p>
