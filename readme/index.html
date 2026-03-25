@@ -276,7 +276,7 @@
   }
   .gh-heatmap-svg {
     width: 100%; height: auto;
-    display: block; min-height: 110px;
+    display: block;
   }
 
   .gh-heatmap-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
@@ -290,7 +290,7 @@
   }
 
    
-.gh-tooltip {
+  .gh-tooltip {
     position: fixed; pointer-events: none;
     z-index: 1000; display: none;
   }
@@ -312,7 +312,6 @@
     transform: translateX(-50%);
   }
 
-   
   .gh-tooltip.above .gh-tooltip__arrow {
     top: 100%;
     border-width: 6px 6px 0 6px;
@@ -323,7 +322,6 @@
     border-color: rgba(17,24,39,0.95) transparent transparent transparent;
   }
 
-   
   .gh-tooltip.below .gh-tooltip__arrow {
     bottom: 100%;
     border-width: 0 6px 6px 6px;
@@ -346,7 +344,6 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-
   .heatmap-cell {
     transition: opacity 150ms, filter 150ms;
     cursor: default;
@@ -362,11 +359,13 @@
   'use strict';
 
   const NS = 'http://www.w3.org/2000/svg';
-  const CELL = 11, GAP = 3, ROWS = 7;
+  const CELL = 11, GAP = 3;
   const LEVEL_OPACITY = [0.05, 0.25, 0.5, 0.75, 1.0];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const DAYS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+  const DAYS_7  = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+  const DAYS_14 = ['', 'Mon', '', 'Wed', '', 'Fri', '', 'Sun', '', 'Tue', '', 'Thu', '', 'Sat'];
   const LABEL_OFFSET = 28, HEADER_OFFSET = 16;
+  const MOBILE_BREAKPOINT = 640;
 
   const svg = document.getElementById('gh-svg');
   const statsCount = document.getElementById('gh-stats-count');
@@ -378,13 +377,29 @@
   function isDark() {
     return document.documentElement.getAttribute('data-color-mode') === 'dark';
   }
-
   function labelColor() {
     return isDark() ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.4)';
   }
-
   function cellColor(level) {
     return `rgba(35,154,59,${LEVEL_OPACITY[Math.min(level, 4)]})`;
+  }
+
+  
+  function getRows() {
+    return window.innerWidth <= MOBILE_BREAKPOINT ? 14 : 7;
+  }
+  function getDays() {
+    return getRows() === 14 ? DAYS_14 : DAYS_7;
+  }
+  function weeks() {
+    return Math.ceil(contributions.length / getRows());
+  }
+  function svgSize() {
+    const rows = getRows();
+    return {
+      w: LABEL_OFFSET + weeks() * (CELL + GAP),
+      h: HEADER_OFFSET + rows * (CELL + GAP),
+    };
   }
 
   
@@ -397,10 +412,11 @@
 
   
   function buildMonthLabels() {
+    const rows = getRows();
     const labels = [];
     let last = -1;
     for (let w = 0; w < weeks(); w++) {
-      const idx = w * ROWS;
+      const idx = w * rows;
       if (idx >= contributions.length) break;
       const m = new Date(contributions[idx].date).getMonth();
       if (m !== last) {
@@ -408,21 +424,18 @@
         last = m;
       }
     }
+    
+    if (labels.length >= 2 && labels[1].x - labels[0].x < CELL + GAP + 20) {
+      labels.shift();
+    }
     return labels;
-  }
+}
 
-  function weeks() {
-    return Math.ceil(contributions.length / ROWS);
-  }
-
-  function svgSize() {
-    return {
-      w: LABEL_OFFSET + weeks() * (CELL + GAP),
-      h: HEADER_OFFSET + ROWS * (CELL + GAP),
-    };
-  }
+  
 
   function render() {
+    const rows = getRows();
+    const days = getDays();
     const { w, h } = svgSize();
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     svg.innerHTML = '';
@@ -432,7 +445,7 @@
     
     buildMonthLabels().forEach(({ text, x }) => {
       const el = document.createElementNS(NS, 'text');
-      el.setAttribute('x', x);
+      el.setAttribute('x',  x);
       el.setAttribute('y', 11);
       el.setAttribute('font-size', 10);
       el.setAttribute('fill', fill);
@@ -441,7 +454,7 @@
     });
 
     
-    DAYS.forEach((d, i) => {
+    days.forEach((d, i) => {
       if (!d) return;
       const el = document.createElementNS(NS, 'text');
       el.setAttribute('x', 0);
@@ -454,8 +467,8 @@
 
     
     contributions.forEach((day, idx) => {
-      const col = Math.floor(idx / ROWS);
-      const row = idx % ROWS;
+      const col = Math.floor(idx / rows);
+      const row = idx % rows;
       const rect = document.createElementNS(NS, 'rect');
       rect.setAttribute('x', LABEL_OFFSET + col * (CELL + GAP));
       rect.setAttribute('y', HEADER_OFFSET + row * (CELL + GAP));
@@ -520,9 +533,6 @@
   svg.addEventListener('mouseover', (e) => {
     if (e.target.classList.contains('heatmap-cell')) showTooltip(e);
   });
-  
-  
-  
   svg.addEventListener('mouseout', (e) => {
     if (e.target.classList.contains('heatmap-cell')) hideTooltip();
   });
@@ -531,6 +541,16 @@
   new MutationObserver(render).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['data-color-mode'],
+  });
+
+  
+  let lastRows = getRows();
+  window.addEventListener('resize', () => {
+    const current = getRows();
+    if (current !== lastRows) {
+      lastRows = current;
+      render();
+    }
   });
 
   
@@ -544,6 +564,7 @@
 
 })();
 </script>
+
 
 <p>19岁，是学生</p>
 <p>喜欢你来，很高兴见到你！<strong>希望你</strong>能在这里找到还算有趣的内容。</p>
