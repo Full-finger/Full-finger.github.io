@@ -3,9 +3,12 @@
 {{ partial "head.html" . }}
 
 <body>
+  <a class="skip-link" href="#main-content">跳到正文</a>
   {{ partial "header" . }}
   {{ partial "search.html" .}}
+  <div id="main-content">
   {{ block "content" . }}{{ end }}
+  </div>
   {{ partial "footer.html" . }}
 </body>
 
