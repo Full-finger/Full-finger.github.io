@@ -1,0 +1,29 @@
+baseURL = "https://full-finger.github.io/"
+languageCode = "zh-cn"
+title = "FullFinger's blog"
+theme = "github-style"
+pygmentsCodeFences = true
+pygmentsUseClasses = true
+
+[params]
+  author = "FullFinger"
+  description = "The best time to plant a tree is 20 years ago. The second-best time is now."
+  github = "Full-finger"
+  email = "full_finger@foxmail.com"
+  url = "https://github.com/Full-finger"
+  keywords = "blog, google analytics"
+  lastmod = true
+  favicon = "/images/github-mark.png"
+  avatar = "/images/avatar.jpg"
+  headerIcon = "/images/github-mark-white.png"
+  location = "Wuhan,China"
+  userStatusEmoji = "🉑"
+  enableGitalk = false
+  enableSearch = false
+  custom_css = ["css/custom.css"]
+
+[frontmatter]
+  lastmod = ["lastmod", ":fileModTime", ":default"]
+
+
+

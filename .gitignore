@@ -1,0 +1,30 @@
+# Hugo build output
+public/
+
+# Hugo build lock
+.hugo_build.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Windows shortcuts
+*.lnk
+
+# Agent spec reference (local only)
+.agent/
+
+# Temporary files
+*.tmp
+*.bak
+新建文本文档.txt
