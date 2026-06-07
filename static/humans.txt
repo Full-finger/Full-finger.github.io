@@ -1,0 +1,12 @@
+/* TEAM */
+Name: FullFinger
+Site: https://full-finger.github.io/
+Location: Wuhan, China
+GitHub: https://github.com/Full-finger
+
+/* SITE */
+Last update: 2026/06/07
+Language: Chinese (Simplified)
+Framework: Hugo
+Theme: github-style (https://github.com/MeiK2333/github-style)
+Host: GitHub Pages

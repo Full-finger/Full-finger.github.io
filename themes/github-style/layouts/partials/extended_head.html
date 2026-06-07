@@ -2,7 +2,7 @@
   content="{{ if .IsHome }}{{ .Site.Params.tagline }}{{ else }}{{ .Summary | plainify }}{{ end }}" />
 <meta name="keywords"
   content='{{ with .Params.Keywords }}{{ delimit . ", " }}{{ else }}{{ $.Site.Params.Keywords }}{{ end }}' />
-<meta name="robots" content="noodp" />
+<meta name="robots" content="index, follow" />
 <link rel="canonical" href="{{ .Permalink }}" />
 
 <!-- Twitter Card -->
@@ -26,6 +26,9 @@
   content="{{ if .IsHome }}{{ $.Site.Params.avatar | absURL }}{{ else }}{{ .Params.Cover | absURL }}{{ end }}">
 <meta property="og:image:width" content="2048">
 <meta property="og:image:height" content="1024">
+<meta property="og:image:alt" content="{{ if .IsHome }}{{ $.Site.Title }}{{ else }}{{ .Title }}{{ end }}">
+<meta property="og:locale" content="zh_CN" />
+<meta property="og:locale:alternate" content="en_US" />
 {{ if isset .Params "date" }}
 <meta property="article:published_time" content="{{ time .Date }}" />
 {{ end }}
@@ -40,7 +43,47 @@
 <link href="{{ .RelPermalink }}" rel="alternate" type="application/json" title="{{ $.Site.Title }}" />
 {{ end }}
 
-<!-- Google Analytics -->
-{{ if eq (getenv "HUGO_ENV") "production"}}
-{{ template "_internal/google_analytics.html" . }}
+<!-- JSON-LD Structured Data -->
+{{ if .IsHome }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ .Site.Title | jsonify }},
+  "url": {{ .Site.BaseURL | jsonify }},
+  "description": {{ .Site.Params.description | jsonify }},
+  {{ with .Site.Params.avatar }}"image": {{ . | absURL | jsonify }},{{ end }}
+  "author": {
+    "@type": "Person",
+    "name": {{ .Site.Params.author | jsonify }},
+    {{ with .Site.Params.url }}"url": {{ . | jsonify }},{{ end }}
+    {{ with .Site.Params.email }}"email": {{ . | jsonify }}{{ end }}
+  }
+}
+</script>
+{{ else if .IsPage }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ .Title | jsonify }},
+  "url": {{ .Permalink | jsonify }},
+  "datePublished": {{ .Date.Format "2006-01-02T15:04:05-07:00" | jsonify }},
+  {{ with .Lastmod }}"dateModified": {{ .Format "2006-01-02T15:04:05-07:00" | jsonify }},{{ end }}
+  "description": {{ .Summary | plainify | jsonify }},
+  "author": {
+    "@type": "Person",
+    "name": {{ .Site.Params.author | jsonify }}
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": {{ .Site.Params.author | jsonify }}
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{ .Permalink | jsonify }}
+  }
+  {{ with .Params.Cover }}, "image": {{ . | absURL | jsonify }}{{ end }}
+}
+</script>
 {{ end }}
