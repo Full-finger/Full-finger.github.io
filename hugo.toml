@@ -1,4 +1,4 @@
-baseURL = "https://full-finger.github.io/"
+baseURL = "https://ffcat.dev/"
 languageCode = "zh-cn"
 title = "FullFinger's blog"
 theme = "github-style"

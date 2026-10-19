@@ -1,6 +1,6 @@
 /* TEAM */
 Name: FullFinger
-Site: https://full-finger.github.io/
+Site: https://ffcat.dev/
 Location: Wuhan, China
 GitHub: https://github.com/Full-finger
 
